@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+
+    <constant name="struts.action.extension" value="action" />
+    <constant name="struts.enable.DynamicMethodInvocation" value="false" />
+    <constant name="struts.devMode" value="true" />
+    <constant name="struts.i18n.encoding" value="UTF-8"></constant>
+    <constant name="struts.ui.theme" value="simple"></constant>
+
+	<package name="base" extends="struts-default">
+		<interceptors>
+			<interceptor name="TrimInterceptor" class="com.flower.interceptor.TrimInterceptor"></interceptor>
+			<interceptor name="HibernateInterceptor" class="com.flower.interceptor.HibernateInterceptor"></interceptor>
+        	<interceptor name="SessionInterceptor" class="com.flower.interceptor.SessionInterceptor"></interceptor>
+        	<interceptor-stack name="default">
+        		<interceptor-ref name="TrimInterceptor"></interceptor-ref>
+        		<interceptor-ref name="HibernateInterceptor"></interceptor-ref>
+        		<!--  <interceptor-ref name="SessionInterceptor"></interceptor-ref>-->
+        		<interceptor-ref name="defaultStack"></interceptor-ref>
+        	</interceptor-stack>
+        </interceptors>
+        <default-interceptor-ref name="default" />
+        
+        <global-results>
+            <result name="login" type="redirectAction">
+            	<param name="namespace">/</param>
+            	<param name="actionName">login</param>  
+            </result>
+            <result name="logon" type="redirectAction">
+            	<param name="namespace">/</param>
+            	<param name="actionName">index</param>
+            </result>
+        </global-results>
+	</package>
+	
+	<package name="adminBase" extends="struts-default">
+		<interceptors>
+			<interceptor name="TrimInterceptor" class="com.flower.interceptor.TrimInterceptor"></interceptor>
+			<interceptor name="HibernateInterceptor" class="com.flower.interceptor.HibernateInterceptor"></interceptor>
+        	<interceptor name="SessionInterceptor" class="com.flower.interceptor.AdminSessionInterceptor"></interceptor>
+        	<interceptor-stack name="default">
+        		<interceptor-ref name="TrimInterceptor"></interceptor-ref>
+        		<interceptor-ref name="HibernateInterceptor"></interceptor-ref>
+        		<interceptor-ref name="SessionInterceptor"></interceptor-ref>
+        		<interceptor-ref name="defaultStack"></interceptor-ref>
+        	</interceptor-stack>
+        </interceptors>
+        <default-interceptor-ref name="default" />
+        
+        <global-results>
+            <result name="login" type="redirectAction">
+            	<param name="namespace">/admin</param>
+            	<param name="actionName">login</param>  
+            </result>
+            <result name="logon" type="redirectAction">
+            	<param name="namespace">/admin</param>
+            	<param name="actionName">index</param>
+            </result>
+        </global-results>
+	</package>
+	
+	<package name="default" namespace="/" extends="base">
+    	
+    	<default-action-ref name="index" />
+        
+        <action name="index">
+            <result>/front/home.jsp</result>
+        </action>
+        
+        <action name="test" class="com.flower.action.TestAction" method="index">
+            <result name="success">/front/test.jsp</result>
+        </action>
+        
+        <action name="register" class="com.flower.action.AuthAction" method="register">
+        	<result name="none">/front/auth/register.jsp</result>
+            <result name="success" type="redirectAction">index</result>
+        </action>
+        
+        <action name="login" class="com.flower.action.AuthAction" method="login">
+            <result name="none">/front/auth/login.jsp</result>
+            <result name="success" type="redirectAction">index</result>
+        </action>
+        
+        <action name="logout" class="com.flower.action.AuthAction" method="logout">
+            <result name="success" type="redirectAction">login</result>
+        </action>
+        
+    </package>
+    
+    <package name="goods" namespace="/goods" extends="base">
+        
+        <action name="list" class="com.flower.action.GoodsAction" method="list">
+        	<result name="success">/front/goods/list.jsp</result>
+        </action>
+        
+        <action name="buy" class="com.flower.action.GoodsAction" method="buy">
+        	<result name="success">/front/goods/buy.jsp</result>
+        </action>
+        
+        <action name="shopping" class="com.flower.action.GoodsAction" method="shopping">
+        	<result name="success">/front/goods/shopping.jsp</result>
+        </action>
+        
+        <action name="removeFromShopping" class="com.flower.action.GoodsAction" method="removeFromShopping">
+        	<result name="success" type="redirectAction">shopping</result>
+        </action>
+        
+    </package>
+    
+    <package name="order" namespace="/order" extends="base">
+        
+        <action name="doOrder" class="com.flower.action.OrderAction" method="doOrder">
+        	<result name="success" type="redirectAction">
+        		<param name="namespace">/goods</param>
+            	<param name="actionName">list</param>
+        	</result>
+        	<result name="error" type="redirectAction">
+        		<param name="namespace">/goods</param>
+            	<param name="actionName">shopping</param>
+        	</result>
+        </action>
+        
+    </package>
+	
+    <package name="adminDefault" namespace="/admin" extends="adminBase">
+    	
+    	<default-action-ref name="index" />
+        
+        <action name="index">
+            <result>/admin/home.jsp</result>
+        </action>
+        
+        <action name="login" class="com.flower.action.admin.AuthAction" method="login">
+            <result name="none">/admin/auth/login.jsp</result>
+            <result name="success" type="redirectAction">index</result>
+        </action>
+        
+        <action name="logout" class="com.flower.action.admin.AuthAction" method="logout">
+            <result name="success" type="redirectAction">login</result>
+        </action>
+        
+        <action name="adminList" class="com.flower.action.admin.AdminAction" method="list">
+            <result name="none">/admin/adminList.jsp</result>
+            <result name="success" type="redirectAction">adminList</result>
+        </action>
+        
+        <action name="delete" class="com.flower.action.admin.AdminAction" method="delete">
+            <result name="success" type="redirectAction">adminList</result>
+        </action>
+        
+    </package>
+    
+    <package name="adminGoods" namespace="/admin/goods" extends="adminBase">
+        
+        <action name="list" class="com.flower.action.admin.GoodsAction" method="list">
+            <result>/admin/goods/goodsList.jsp</result>
+        </action>
+        
+        <action name="categoryInput" class="com.flower.action.admin.GoodsAction" method="categoryInput">
+            <result>/admin/goods/categoryInput.jsp</result>
+        </action>
+        
+        <action name="categoryDelete" class="com.flower.action.admin.GoodsAction" method="categoryDelete">
+            <result name="success" type="redirectAction">categoryInput</result>
+        </action>
+        
+        <action name="input" class="com.flower.action.admin.GoodsAction" method="input">
+            <result name="none">/admin/goods/goodsInput.jsp</result>
+            <result name="success" type="redirectAction">list</result>
+        </action>
+        
+        <action name="edit" class="com.flower.action.admin.GoodsAction" method="edit">
+            <result name="none">/admin/goods/goodsEdit.jsp</result>
+            <result name="success" type="redirectAction">list</result>
+        </action>
+        
+        <action name="delete" class="com.flower.action.admin.GoodsAction" method="delete">
+            <result name="success" type="redirectAction">list</result>
+        </action>
+        
+    </package>
+    
+    <package name="adminUser" namespace="/admin/user" extends="adminBase">
+    
+    	<action name="list" class="com.flower.action.admin.UserAction" method="list">
+            <result>/admin/user/userList.jsp</result>
+        </action>
+        
+        <action name="delete" class="com.flower.action.admin.UserAction" method="delete">
+            <result name="success" type="redirectAction">list</result>
+        </action>
+        
+    </package>
+    
+    <package name="adminOrder" namespace="/admin/order" extends="adminBase">
+    
+    	<action name="list" class="com.flower.action.admin.OrderAction" method="list">
+            <result>/admin/order/orderList.jsp</result>
+        </action>
+        
+        <action name="detail" class="com.flower.action.admin.OrderAction" method="detail">
+            <result>/admin/order/orderDetailList.jsp</result>
+        </action>
+        
+    </package>
+    
+
+</struts>
